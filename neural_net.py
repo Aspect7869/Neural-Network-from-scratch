@@ -42,3 +42,56 @@ def forward_prop(w1,b1,w2,b2,X):
     A2=softmax(Z2)
 
     return Z1,A1,Z2,A2
+
+
+# Loss calculation would be done using negative log likelihood function
+
+def loss(y, A2): 
+    # Here y = ground truth labels, and A2 = NN's final predictions
+    # If the prediction in A2 is close to 1 and correct, then the log will tend to 0
+    # => Smaller loss
+    # If the probability is close to 0 and wrong, then the log blows up to a bigger number
+    # => Bigger loss
+    # Multiplying the log of the prediction with Y forces the calculation of only the right number
+    # THis is because Y is a mtrix of one hots, meaning the dot will 0 with every other prediction.
+    n=y.shape[0] # Number of samples, 60k in this case
+    ep=1e-8 # we add a small value to prevent the crash at log(0)
+    L= -(1/n)* np.sum((y.T)*np.log(A2+ep)) 
+    return L
+
+def predictions(A2):
+    # np.argmax looks at the 10 probabilities for an image and returns the index of highest probabiity wala number
+    # we need to add axis=0 in this case, as A2 is a 10 row x 60k column matrix.
+    # without axis=0, np.argmax would return the greatest number's index from the 600k numbers in A2.
+    return np.argmax(A2, axis=0)
+
+def accuracy(pred, y):
+    # We now convert the one hot matrix back to simple digits, to compare it directly to our predictions.
+    # axis=1 basically moves thru the matrix row by row and returns the index of the 1 present in the row.
+    # Y is a 60k rows x 10 column matrix btw.
+    labels=np.argmax(y,axis=1)
+    acc= np.sum(pred==labels)/y.shape[0]
+    return acc
+
+
+if __name__ == "__main__":
+    # Import your data loader from the other file
+    from mnist_data import loadprepd_data
+    
+    # 1. Load the data
+    xtrain, ytrain, xtest, ytest = loadprepd_data()
+    
+    # 2. Initialize random parameters
+    W1, b1, W2, b2 = init_params()
+    
+    # 3. Do a forward pass
+    Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, xtrain)
+    
+    # 4. Calculate the initial loss and accuracy
+    initial_loss = loss(ytrain, A2)
+    predictions = predictions(A2)
+    initial_accuracy = accuracy(predictions, ytrain)
+    
+    print(f"\n--- Initial Network Test ---")
+    print(f"Starting Loss: {initial_loss:.4f}")
+    print(f"Starting Accuracy: {initial_accuracy * 100:.2f}%")

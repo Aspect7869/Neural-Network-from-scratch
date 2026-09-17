@@ -1,4 +1,4 @@
-# Neural network built from scratch with minimal use of AI.
+# Neural network built from scratch with minimal use of AI btw
 # By Aaryan Sonawane 
 
 import numpy as np 
@@ -45,10 +45,10 @@ def load_nmnist_labels(fpath):
 def loadprepd_data(): 
     # Now we just load and read the data and store em into some variable 
     print("Loading the binary data. . . ") 
-    xtrain=load_mist_images('archives/train-images.idx3-ubyte') 
-    ytrain=load_nmnist_labels('archives/train-labels.idx1-ubyte') 
-    xtest=load_mist_images('archives/t10k-images.idx3-ubyte') 
-    ytest=load_nmnist_labels('archives/t10k-labels.idx1-ubyte') 
+    xtrain=load_mist_images('archive/train-images.idx3-ubyte') 
+    ytrain=load_nmnist_labels('archive/train-labels.idx1-ubyte') 
+    xtest=load_mist_images('archive/t10k-images.idx3-ubyte') 
+    ytest=load_nmnist_labels('archive/t10k-labels.idx1-ubyte') 
     print("Data loaded successful;ly") 
     print(f"X train shape :{xtrain.shape} (60k images, 784 pixels each)") 
     print(f"y train shape :{ytrain.shape} (60k labels, 10 one-shot classes)") 
