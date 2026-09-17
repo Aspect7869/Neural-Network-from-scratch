@@ -73,6 +73,45 @@ def accuracy(pred, y):
     acc= np.sum(pred==labels)/y.shape[0]
     return acc
 
+def ReLu_deriv(z):
+    # Returns 1 for every element>0, 0 for every element<=0, as ReLu is basically x=y for x>0.
+    # We get a True for every element>0 and false for element <=0.
+    # Z = Wx+b, which is the preactivation value.
+    return z>0
+
+def backprop(z1,a1,z2,a2,w1,w2,x,y):
+    n=y.shape[0] # number of images
+    # Output layer error :
+    dz2=a2-(y.T)
+
+    # Output layer gradient : (for w2 and b2)
+    dw2=(1/n)*dz2.dot(a1.T)
+    # axis=1, sums across the columns,to get 1 bias per node
+    # Shape of dz2 is 10 rows X 60K columns, bias matrix has the shape of only 10 rows x 1 column
+    # keeping axis=1 basically collapses 60k columns into 1 row, by summing all of them up
+    # keepdims= True basically keeps the dimensions the safe, and does not collapse the entire 
+    # matrix into something like a rank 1 matrix. (Ts was added by AI as a safeguard during debugging)
+    db2= (1/n)*np.sum(dz2, axis=1, keepdims=True)
+
+    # Hidden Layer error :
+    # w2.T's shape is (128,10)
+    # dz2 is the shape of (10, 60k)
+    # result is the shape of (128, 60k)
+    dz1=w2.T.dot(dz2)*ReLu_deriv(z1)
+
+    # Hidden Layer Gradients (Derivative for w1 n b1):
+    dw1=(1/n)*dz1.dot(x) 
+    db1=(1/n)*np.sum(dz1,axis=1,keepdims=True)
+
+    return dw1,db1,dw2,db2
+
+def update_params(w1, b1, w2, b2, dw1, db1, dw2, db2, a):
+    # a is the learning rate. Dictates how massive of a step we take. 
+    w1=w1-a*dw1
+    b1=b1-a*db1
+    w2=w2-a*dw2
+    b2=b2-a*db2
+    return w1, b1, w2, b2
 
 if __name__ == "__main__":
     # Import your data loader from the other file
@@ -89,9 +128,10 @@ if __name__ == "__main__":
     
     # 4. Calculate the initial loss and accuracy
     initial_loss = loss(ytrain, A2)
-    predictions = predictions(A2)
+    preds = predictions(A2)
     initial_accuracy = accuracy(predictions, ytrain)
     
     print(f"\n--- Initial Network Test ---")
     print(f"Starting Loss: {initial_loss:.4f}")
     print(f"Starting Accuracy: {initial_accuracy * 100:.2f}%")
+
