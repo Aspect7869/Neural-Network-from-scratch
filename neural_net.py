@@ -113,16 +113,32 @@ def update_params(w1, b1, w2, b2, dw1, db1, dw2, db2, a):
     b2=b2-a*db2
     return w1, b1, w2, b2
 
+def grad_descent(x,y,a,I):
+    w1,b1,w2,b2= init_params()
+    for i in range(I):
+        # Forward pass :
+        z1,a1,z2,a2=forward_prop(w1,b1,w2,b2)
+
+        # backward pass :
+        dw1,db1,dw2,db2=backprop(z1,a1,z2,a2,w1,w2,x,y)
+
+        # update parameters :
+        w1,b1,w2,b2=update_params(w1,b1,w2,b2,dw1,db1,dw2,db2,a)
+
+        # printing progress every 50th iteration:
+        if i%50==0:
+            l=loss(y,a2)
+            p=predictions(a2)
+            acc=accuracy(p, y)
+            print(f"Iteration : {i} | Loss : {l:5f} | Accuracy : {acc*100 :2f}")
+    return w1,b1,w2,b2
+
 if __name__ == "__main__":
-    # Import your data loader from the other file
     from mnist_data import loadprepd_data
-    
-    # 1. Load the data
     xtrain, ytrain, xtest, ytest = loadprepd_data()
-    
-    # 2. Initialize random parameters
-    W1, b1, W2, b2 = init_params()
-    
+    W1, b1, W2, b2 = init_params() # initializing parameters to a random value
+    print("\n ..................Starting Training..................") 
+    W1,b1,W2,b2=grad_descent(xtrain,ytrain,a=0.01,I=50000)
     # 3. Do a forward pass
     Z1, A1, Z2, A2 = forward_prop(W1, b1, W2, b2, xtrain)
     
